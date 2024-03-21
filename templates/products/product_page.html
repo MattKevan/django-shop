@@ -1,0 +1,50 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load cloudinary %}
+
+
+{% block content %}
+{% cloudinary product.image.name %}
+<div class="max-w-5xl mx-auto py-12 px-6">
+
+    <div class="grid sm:grid-cols-6 gap-6">
+        <div class="sm:col-span-4">
+            <img src="{{ product.images.all.0.image.url }}" alt="{{ product.title }}" class="h-full w-full object-cover object-center group-hover:opacity-75">
+
+        </div>
+
+        <div class="sm:col-span-2">
+            <h1 class="text-3xl mb-6">{% block title %}{{ product.title }}{% endblock title %}</h1>
+            <p class="">{{ product.description}}</p>
+
+
+        </div>
+
+    </div>
+
+
+
+    <h2>Variations</h2>
+{% for variation in variations %}
+    <div class="variation">
+        <h3>{{ variation.title }}</h3>
+        <p>SKU: {{ variation.sku }}</p>
+        <p>Price: {{ variation.price }}</p>
+        
+        <ul>
+            {% for option in variation.parent_options %}
+                <li>{{ option.attribute.title }}: {{ option.title }}</li>
+            {% endfor %}
+        </ul>
+        <form method="post" action="{% url 'cart:add_to_cart' variation.id %}">
+            {% csrf_token %}
+            <label for="quantity">Quantity:</label>
+            <input type="number" name="quantity" value="1" min="1" required>
+            <button type="submit">Add to Cart</button>
+        </form>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock content %}

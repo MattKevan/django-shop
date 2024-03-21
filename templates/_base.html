@@ -21,15 +21,16 @@
     defer
     integrity="sha384-KLv/Yaw8nAj6OXX6AvVFEt1FNRHrfBHziZ2JzPhgO9OilYrn6JLfCR4dZzaaQCA5"
     crossorigin="anonymous"></script>
-
+    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'js/preline.js' %}"></script>
   {% tailwind_css %}
 
   {% block css %}
-    <link rel="stylesheet" href="{% static 'css/base.css' %}"  hx-indicator=".progress">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}"  >
   {% endblock %}
 </head>
 
-<body hx-headers="{'X-CSRFToken': '{{ csrf_token }}'}" hx-boost="true" class="dark:bg-slate-900">
+<body hx-boost="true" hx-push-url="true" class="dark:bg-slate-900" hx-indicator=".progress">
   
   {% include '_header.html' %}
 

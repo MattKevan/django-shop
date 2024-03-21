@@ -4,9 +4,11 @@
  * If you need the full config, get it from here:
  * https://unpkg.com/browse/tailwindcss@latest/stubs/defaultConfig.stub.js
  */
+const defaultTheme = require('tailwindcss/defaultTheme')
 
 module.exports = {
     content: [
+        'node_modules/preline/dist/*.js',
         /**
          * HTML. Paths to Django template files that will contain Tailwind CSS classes.
          */
@@ -42,6 +44,11 @@ module.exports = {
         // '../../**/*.py'
     ],
     theme: {
+        fontFamily: {
+            'sans': ['HK Grotesk', ...defaultTheme.fontFamily.sans],
+            'serif': ['Calendas Plus', ...defaultTheme.fontFamily.serif],
+      
+          },
         extend: {},
     },
     plugins: [
@@ -50,11 +57,11 @@ module.exports = {
          * for forms. If you don't like it or have own styling for forms,
          * comment the line below to disable '@tailwindcss/forms'.
          */
-        //require('@tailwindcss/forms'),
+        require('@tailwindcss/forms'),
         require('@tailwindcss/typography'),
         require('@tailwindcss/line-clamp'),
         require('@tailwindcss/aspect-ratio'),
-        //require("daisyui"),
+        require('preline/plugin'),
     ],
     
 }

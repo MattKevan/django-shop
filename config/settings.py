@@ -1,12 +1,14 @@
 from pathlib import Path
 from dotenv import load_dotenv
-#import cloudinary
-#import cloudinary.uploader
-#import cloudinary.api
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 import os
 
 # Load environment variables from .env file
 load_dotenv()
+
+SITE_NAME = "Shop"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,17 +19,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = os.getenv('DEBUG')
 
-# Cloudinary settings
-#CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
-#CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY')
-#CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET')
-
-#cloudinary.config(
-#  cloud_name = CLOUDINARY_CLOUD_NAME,
-#  api_key = CLOUDINARY_API_KEY,
-#  api_secret = CLOUDINARY_API_SECRET,
-#  secure = True
-#)
+cloudinary.config(
+  cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+  api_key = os.getenv('CLOUDINARY_API_KEY'),
+  api_secret = os.getenv('CLOUDINARY_API_SECRET')
+)
+# Shop config
+TAX_RATE = 0.2
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
@@ -43,6 +41,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     # Third-party
+    'cloudinary_storage',
+    'cloudinary',
     "allauth",
     "allauth.account",
     "crispy_forms",
@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.pages",
     "apps.products",
+    "apps.catalogue",
+    "apps.cart",
 ]
 
 TAILWIND_APP_NAME = 'theme'
@@ -165,18 +167,13 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # https://whitenoise.readthedocs.io/en/latest/django.html
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+
+
+MEDIA_URL = '/media/'  # or any prefix you choose
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 #DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # django-crispy-forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs

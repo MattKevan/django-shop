@@ -1,0 +1,33 @@
+{% extends '_base.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-12 px-6">
+
+  
+<h1 class="page-title">{% block title %}Shop{% endblock title %}</h1>
+
+<div class="products grid grid-cols-1 sm:grid-cols-3 gap-6">
+    {% for product in products %}
+    <div class="group">
+        <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+            {% if product.images.all %}
+
+          <a href="{% url 'product_page' slug=product.slug %}">
+            <img src="{{ product.images.all.0.image.url }}" alt="{{ product.title }}" class="h-full w-full object-cover object-center group-hover:opacity-75">
+          </a>
+          {% endif %}
+
+        </div>
+        <h3 class="mt-4 text-sm text-gray-700 hover:text-gray-300">
+            <a href="{% url 'product_page' slug=product.slug %}">{{ product.title }}</a>
+        </h3>
+        <p class="mt-1 text-lg font-sans">£14.99+</p>
+    </div>
+    
+    {% endfor %}
+</div>
+</div>
+
+{% endblock content %}

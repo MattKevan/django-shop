@@ -2,21 +2,41 @@ from django.db import models
 from django.utils.text import slugify
 import itertools
 
+def generate_variations(instance):
+    if instance.attributes.exists():
+        attributes = instance.attributes.all()
+        options = [list(attr.options.all()) for attr in attributes]
+        option_combinations = list(itertools.product(*options))
+
+        existing_variations = instance.variations.all()
+        existing_variation_titles = set(existing_variations.values_list('title', flat=True))
+
+        for combination in option_combinations:
+            variation_title = ' - '.join(option.title for option in combination)
+            if variation_title not in existing_variation_titles:
+                variation = Variation.objects.create(
+                    product_template=instance if isinstance(instance, ProductTemplate) else None,
+                    product=instance if isinstance(instance, Product) else None,
+                    title=variation_title
+                )
+                variation.options.set(combination)
 # Product
 
 class Attribute(models.Model):
     title = models.CharField(max_length=255)
+   # options = models.ManyToManyField('Option', related_name='attributes', blank=True)
 
     def __str__(self):
         return self.title
 
 class Option(models.Model):
     title = models.CharField(max_length=255)
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='options')
-
+    attribute = models.ForeignKey('Attribute', on_delete=models.CASCADE, related_name='options', null=True)
     def __str__(self):
-        return self.title	
+        return self.title
 
+
+        
 class Variation(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='variations', null=True)
     product_template = models.ForeignKey('ProductTemplate', on_delete=models.CASCADE, related_name='variations', null=True)
@@ -24,6 +44,9 @@ class Variation(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     image = models.ImageField(upload_to='variations/', null=True, blank=True)
     options = models.ManyToManyField(Option, related_name='variations')
+    sku = models.CharField(max_length=50, blank=True)
+    base_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    published = models.BooleanField(default=True, null=True)
     
     def __str__(self):
         return self.title
@@ -46,6 +69,7 @@ class Collection(models.Model):
                 self.slug = f"{slugify(self.title)}-{counter}"
         super().save(*args, **kwargs)
 
+
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
@@ -57,62 +81,11 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-    def generate_variations(self):
-        attributes = self.attributes.all()
-        options_dict = {}
-        for attribute in attributes:
-            options_dict[attribute.title] = attribute.options.all()
-
-        variations = []
-        if options_dict:
-            variations = [dict(zip(options_dict.keys(), v)) for v in itertools.product(*options_dict.values())]
-
-        existing_variations = self.variations.all()
-        for variation_data in variations:
-            options = []
-            title = []
-            for attr_title, option in variation_data.items():
-                options.append(option)
-                title.append(f"{option.title}")
-
-            variation_title = " - ".join(title)
-
-            # Check if a variation with the same options exists for this product
-            try:
-                variation = self.variations.filter(options__in=options).distinct().get()
-            except Variation.DoesNotExist:
-                # Create a new variation if it doesn't exist
-                variation = Variation.objects.create(product=self, title=variation_title)
-                variation.options.set(options)
-                variation.save()
-
-        for variation in existing_variations:
-            if variation.options.all() not in [list(v.values()) for v in variations]:
-                variation.delete()
-
-    def sync_variations(self):
-        if self.product_template:
-            template_variations = self.product_template.variations.all()
-            for template_variation in template_variations:
-                options = template_variation.options.all()
-                try:
-                    variation = self.variations.filter(options__in=options).distinct().get()
-                except Variation.DoesNotExist:
-                    variation = Variation.objects.create(product=self, title=template_variation.title)
-                    variation.options.set(options)
-                
-                variation.price = template_variation.price
-                variation.image = template_variation.image
-                variation.save()
-
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-            counter = 0
-            while Product.objects.filter(slug=self.slug).exists():
-                counter += 1
-                self.slug = f"{slugify(self.title)}-{counter}"
 
+        # Check if the product template has changed
         template_changed = False
         if self.pk:
             original_product = Product.objects.get(pk=self.pk)
@@ -125,13 +98,53 @@ class Product(models.Model):
 
         if template_changed:
             if self.product_template:
-                self.attributes.set(self.product_template.attributes.all())
-                self.sync_variations()
-            else:
-                self.attributes.clear()
+                # Delete old variations associated with the product
                 self.variations.all().delete()
+
+                # Clear existing attributes from the product
+                self.attributes.clear()
+
+                # Add attributes from the product template to the product
+                self.attributes.set(self.product_template.attributes.all())
+
+                # Generate variations for the product based on the updated attributes
+                generate_variations(self)
+
+                # Copy values from template variations to matching product variations
+                for template_variation in self.product_template.variations.all():
+                    product_variation, created = self.variations.get_or_create(title=template_variation.title)
+                    product_variation.price = template_variation.price
+                    product_variation.image = template_variation.image
+                    product_variation.sku = template_variation.sku
+                    product_variation.base_price = template_variation.base_price
+                    product_variation.published = template_variation.published
+                    product_variation.options.set(template_variation.options.all())
+                    product_variation.save()
+            else:
+                # If no template is selected, delete all variations and clear attributes
+                self.variations.all().delete()
+                self.attributes.clear()
         else:
-            self.generate_variations()
+            # Update product variations to match the changes made to the template variations
+            if self.product_template:
+                for template_variation in self.product_template.variations.all():
+                    product_variation, created = self.variations.get_or_create(title=template_variation.title)
+                    product_variation.price = template_variation.price
+                    product_variation.base_price = template_variation.base_price
+                    product_variation.sku = template_variation.sku
+                    product_variation.image = template_variation.image
+                    product_variation.options.set(template_variation.options.all())
+                    product_variation.save()
+
+            generate_variations(self)
+
+class ProductImage(models.Model):
+    product = models.ForeignKey('Product', related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='product_images/')
+    alt_text = models.CharField(max_length=255, blank=True, help_text="A brief description of the image.")
+
+    def __str__(self):
+        return f"Image for {self.product.title} ({self.id})"
 
 class ProductTemplate(models.Model):
     title = models.CharField(max_length=255)
@@ -149,28 +162,4 @@ class ProductTemplate(models.Model):
                 counter += 1
                 self.slug = f"{slugify(self.title)}-{counter}"
         super().save(*args, **kwargs)
-        self.generate_variations()
-
-    def generate_variations(self):
-        attributes = self.attributes.all()
-        options_dict = {}
-        for attribute in attributes:
-            options_dict[attribute.title] = attribute.options.all()
-
-        variations = []
-        if options_dict:
-            variations = [dict(zip(options_dict.keys(), v)) for v in itertools.product(*options_dict.values())]
-
-        existing_variations = self.variations.all()
-        for variation_data in variations:
-            title = ' - '.join([f"{key}: {value}" for key, value in variation_data.items()])
-            variation, created = Variation.objects.get_or_create(product_template=self, title=title)
-            if created:
-                for attr_title, option in variation_data.items():
-                    attribute = Attribute.objects.get(title=attr_title)
-                    variation.options.add(option)
-                variation.save()
-
-        for variation in existing_variations:
-            if variation.title not in [v['title'] for v in variations]:
-                variation.delete()
+        generate_variations(self)
