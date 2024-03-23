@@ -1,0 +1,21 @@
+{% extends '_base.html' %}
+{% load static %}
+
+
+{% block content %}
+<h1>Store Manager Dashboard</h1>
+
+  <h2>Store Configuration</h2>
+  <ul>
+    <li>Name: {{ store_config.name }}</li>
+    <!-- Display other store configuration fields -->
+  </ul>
+  <a href="{% url 'create_product' shop_slug=shop.slug %}">Add product</a>
+  <h2>Shops</h2>
+  <ul>
+    {% for shop in shops %}
+      <li>{{ shop.name }}</li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}

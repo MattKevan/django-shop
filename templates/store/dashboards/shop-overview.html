@@ -1,0 +1,33 @@
+{% extends '_base-dashboard.html' %}
+
+{% block title%} {{ shop.name }}{% endblock title%}
+{% block content %}
+  <h2>Shop Details</h2>
+  <ul>
+    <li>Name: {{ shop.name }}</li>
+    <li>Description: {{ shop.description }}</li>
+    <!-- Display other shop fields -->
+  </ul>
+
+  <h2>Products</h2>
+  <ul>
+    {% for product in products %}
+      <li>
+        {{ product.title }}
+      </li>
+    {% empty %}
+      <li>No products found.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'create_product' shop_slug=shop.slug %}">Add Product</a>
+
+  <h2>Other Shops</h2>
+  <ul>
+    {% for shop in user_shops %}
+      <li>
+        <a href="{% url 'shop_dashboard' shop_slug=shop.slug %}">{{ shop.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

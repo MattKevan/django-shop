@@ -8,6 +8,7 @@ urlpatterns = [
     path("", include("apps.pages.urls")),
     path('', include('apps.products.urls')),
     path('', include('apps.catalogue.urls')),
+    path('', include('apps.store.urls')),
     path('cart/', include('apps.cart.urls', namespace='cart')),
     path("__reload__/", include("django_browser_reload.urls")),
 ]

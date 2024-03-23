@@ -1,0 +1,11 @@
+{% extends '_base-dashboard.html' %}
+
+{% block content %}
+  <h1>Create Product for {{ shop.name }}</h1>
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Create Product</button>
+  </form>
+{% endblock %}

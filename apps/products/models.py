@@ -1,6 +1,13 @@
 from django.db import models
 from django.utils.text import slugify
 import itertools
+import logging
+from django.conf import settings
+from datetime import date
+from apps.store.models import Shop
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 def generate_variations(instance):
     if instance.attributes.exists():
@@ -38,6 +45,7 @@ class Option(models.Model):
 
         
 class Variation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='variations', null=True)
     product_template = models.ForeignKey('ProductTemplate', on_delete=models.CASCADE, related_name='variations', null=True)
     title = models.CharField(max_length=255, blank=True)
@@ -71,12 +79,15 @@ class Collection(models.Model):
 
 
 class Product(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=255)
+    date_created = models.DateField(default=date.today)  # Converted to DateField
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(blank=True)
     collection = models.ManyToManyField('Collection', related_name='products', blank=True)
     attributes = models.ManyToManyField(Attribute, related_name='products', blank=True)
     product_template = models.ForeignKey('ProductTemplate', on_delete=models.SET_NULL, related_name='products', null=True, blank=True)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -95,9 +106,16 @@ class Product(models.Model):
             template_changed = True
 
         super().save(*args, **kwargs)
+        logger.debug('Saving product: %s', self.title)
+
 
         if template_changed:
             if self.product_template:
+                
+                logger.debug('Product template is set: %s', self.product_template.title)
+                attributes_before = self.attributes.all()
+                logger.debug('Current product attributes before setting new ones: %s', list(attributes_before))
+
                 # Delete old variations associated with the product
                 self.variations.all().delete()
 
@@ -106,6 +124,11 @@ class Product(models.Model):
 
                 # Add attributes from the product template to the product
                 self.attributes.set(self.product_template.attributes.all())
+
+                self.refresh_from_db(fields=['attributes'])
+                attributes_after = self.attributes.all()
+                logger.debug('New product attributes after setting: %s', list(attributes_after))
+
 
                 # Generate variations for the product based on the updated attributes
                 generate_variations(self)
@@ -147,6 +170,7 @@ class ProductImage(models.Model):
         return f"Image for {self.product.title} ({self.id})"
 
 class ProductTemplate(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     attributes = models.ManyToManyField(Attribute, related_name='product_templates', blank=True)

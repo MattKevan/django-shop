@@ -10,6 +10,25 @@ load_dotenv()
 
 SITE_NAME = "Shop"
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'apps.products': {  # Use an appropriate name for your app
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -54,6 +73,8 @@ INSTALLED_APPS = [
     "widget_tweaks",
     # Local
     "theme",
+    "apps.store",
+    "apps.orders",
     "apps.accounts",
     "apps.pages",
     "apps.products",
