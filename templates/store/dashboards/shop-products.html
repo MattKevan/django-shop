@@ -18,21 +18,30 @@
 {% block title %}Products{% endblock title%}
 
 {% block content %}
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-4 mb-12">
 
-  <h2>Shop Details</h2>
-  <ul>
-    <li>Name: {{ shop.name }}</li>
-    <li>Description: {{ shop.description }}</li>
-    <!-- Display other shop fields -->
-  </ul>
+{% for product in products %}
 
-  <h2>Products</h2>
+
+  <div class="border dark:border-gray-700 rounded bg-white dark:bg-gray-800">
+    <a href="{% url 'edit_product' shop_slug=shop.slug product_slug=product.slug %}">
+    <img src="{{ product.images.all.0.image.url }}" alt="{{ product.title }}" class="w-full">
+    </a>
+    <div class="p-4">
+      <h3 class="font-bold font-sans"><a href="{% url 'edit_product' shop_slug=shop.slug product_slug=product.slug %}">{{ product.title }}</a></h3>
+      {{ product.price }}
+    </div>
+  </div>
+
+    {% empty %}
+    <li>No products found.</li>
+
+  {% endfor %}
+</div>
+
+
   <a href="{% url 'create_product' shop_slug=shop.slug %}">Add Product</a>
-  <ul>
-    {% for product in products %}
-      <li>{{ product.name }}</li>
-    {% endfor %}
-  </ul>
+ 
 
   <h2>Other Shops</h2>
   <ul>

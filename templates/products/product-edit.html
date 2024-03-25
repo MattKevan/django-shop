@@ -1,0 +1,149 @@
+{% extends '_base-dashboard.html' %}
+{% block title %}Edit {{ product.title }}{% endblock title %}
+
+{% block breadcrumb %}
+<ol class="ms-3 flex items-center whitespace-nowrap" aria-label="Breadcrumb">
+  <li class="flex items-center text-sm text-gray-800 dark:text-gray-400">
+    Shop manager
+    <svg class="flex-shrink-0 mx-3 overflow-visible size-2.5 text-gray-400 dark:text-gray-600" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 1L10.6869 7.16086C10.8637 7.35239 10.8637 7.64761 10.6869 7.83914L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </li>
+  <li class="text-sm font-semibold text-gray-800 truncate dark:text-gray-400" aria-current="page">
+    Edit {{ product.title }}
+  </li>
+</ol>
+<!-- End Breadcrumb -->
+{% endblock breadcrumb%}
+
+{% block content %}
+<div class="tab-group mb-36">
+<select id="tab-select" class="sm:hidden py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400" aria-label="Tabs" role="tablist">
+  <option value="#hs-tab-to-select-1">Details</option>
+  <option value="#hs-tab-to-select-2">Images</option>
+  <option value="#hs-tab-to-select-3">Variations</option>
+</select>
+
+<div class="hidden sm:block border-b border-gray-200 dark:border-gray-700">
+  <nav class="flex space-x-2" aria-label="Tabs" role="tablist" hs-data-tab-select="#tab-select">
+    <button type="button" class="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-gray-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-2 bg-gray-50 text-sm font-medium text-center border text-gray-500 rounded-t-lg hover:text-gray-700 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-gray-700 dark:text-gray-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600 active" id="hs-tab-to-select-item-1" data-hs-tab="#hs-tab-to-select-1" aria-controls="hs-tab-to-select-1" role="tab">
+      Details
+    </button>
+    <button type="button" class="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-gray-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-2 bg-gray-50 text-sm font-medium text-center border text-gray-500 rounded-t-lg hover:text-gray-700 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-gray-700 dark:text-gray-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" id="hs-tab-to-select-item-2" data-hs-tab="#hs-tab-to-select-2" aria-controls="hs-tab-to-select-2" role="tab">
+      Images
+    </button>
+    <button type="button" class="hs-tab-active:bg-white hs-tab-active:border-b-transparent hs-tab-active:text-blue-600 dark:hs-tab-active:bg-gray-800 dark:hs-tab-active:border-b-gray-800 dark:hs-tab-active:text-white -mb-px py-3 px-4 inline-flex items-center gap-2 bg-gray-50 text-sm font-medium text-center border text-gray-500 rounded-t-lg hover:text-gray-700 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-700 dark:border-gray-700 dark:text-gray-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" id="hs-tab-to-select-item-3" data-hs-tab="#hs-tab-to-select-3" aria-controls="hs-tab-to-select-3" role="tab">
+      Variations
+    </button>
+  </nav>
+</div>
+
+<div class="mt-6">
+  <div id="hs-tab-to-select-1" role="tabpanel" aria-labelledby="hs-tab-to-select-item-1">
+    <div class="p-3 sm:p-0">
+
+      <form id="product-form" method="POST" class="grid grid-cols-1 gap-6" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="id_title" class="">Title</label>
+          <input type="text" name="title" id="id_title" value="{{ form.title.value }}" required class="input-text" placeholder="Title">
+        </div>
+
+        <div class="form-group">
+          <label for="id_description" class="field-label">Description</label>
+          <textarea name="description" id="id_description" class="input-textarea">{{ form.description.value }}</textarea>
+          {% if form.description.errors %}
+            <span class="error">{{ form.description.errors }}</span>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="id_collection" class="field-label">Collections</label>
+          <div class="relative">
+            <select name="collection" id="id_collection" multiple data-hs-select='{
+                "placeholder": "Select collections",
+                "toggleTag": "<button type=\"button\"></button>",
+                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 px-4 pe-9 flex text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-[1] dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600",
+                "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto dark:bg-slate-900 dark:border-gray-700",
+                "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-none focus:bg-gray-100 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-gray-200 dark:focus:bg-slate-800",
+                "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"flex-shrink-0 size-3.5 text-blue-600 dark:text-blue-500\" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>"
+              }' class="hidden">
+              {% for collection in form.collection.field.queryset %}
+                <option value="{{ collection.pk }}" {% if collection in form.collection.value %}selected{% endif %}>
+                  {{ collection.name }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="absolute top-1/2 end-3 -translate-y-1/2">
+              <svg class="flex-shrink-0 size-3.5 text-gray-500 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+            </div>
+          </div>
+          <!-- End Select -->
+        </div>
+
+        <div class="attributes form-group">
+          <label for="id_attributes" class="field-label">Attributes</label>
+          <div class="relative">
+            <select name="attributes" id="id_attributes" multiple data-hs-select='{
+                "placeholder": "Select attributes",
+                "toggleTag": "<button type=\"button\"></button>",
+                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 px-4 pe-9 flex text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-[1] dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600",
+                "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto dark:bg-slate-900 dark:border-gray-700",
+                "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-none focus:bg-gray-100 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-gray-200 dark:focus:bg-slate-800",
+                "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"flex-shrink-0 size-3.5 text-blue-600 dark:text-blue-500\" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>"
+              }' class="hidden">
+              {% for attribute in form.attributes.field.queryset %}
+              <option value="{{ attribute.pk }}" {% if attribute in form.attributes.value %}selected{% endif %}>
+                {{ attribute.title }}
+              </option>
+              {% endfor %}
+            </select>
+            <div class="absolute top-1/2 end-3 -translate-y-1/2">
+              <svg class="flex-shrink-0 size-3.5 text-gray-500 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+            </div>
+
+          </div>
+          <!-- End Select -->
+        </div>
+
+      </form>
+    </div>
+  </div>
+  <div id="hs-tab-to-select-2" class="hidden" role="tabpanel" aria-labelledby="hs-tab-to-select-item-2">
+    <div class="p-3 sm:p-0">
+      <div id="image-formset" class="grid grid-cols-3 sm:grid-cols-6 gap-5">
+        {% for image in product.images.all %}
+          <div class="product-image">
+            <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="w-full">
+            <p>{{ image.alt_text }}</p>
+            <button class="delete-image" hx-post="{% url 'delete_product_image' %}" hx-vals='{"image_id": "{{ image.id }}"}' hx-target="closest .product-image" hx-swap="outerHTML" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Delete</button>
+          </div>
+        {% endfor %}
+        <form id="image-form" hx-post="{% url 'add_product_image' %}" hx-encoding="multipart/form-data" hx-target="#image-formset" hx-swap="beforeend">
+          {% csrf_token %}
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <input type="file" name="image" required>
+          <input type="text" name="alt_text" placeholder="Alt Text">
+          <button type="submit">Add Image</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="hs-tab-to-select-3" class="hidden" role="tabpanel" aria-labelledby="hs-tab-to-select-item-3">
+    <div class="p-3 sm:p-0">
+      <p class="text-gray-500 dark:text-gray-400">
+        This is the <em class="font-semibold text-gray-800">third</em> item's tab body.
+      </p>
+    </div>
+  </div>
+
+</div>
+</div>
+<div class= "fixed bottom-0 right-0">
+  <div class="mb-6 mr-6">
+    <button type="submit" form="product-form" class="button-primary z-[100]">Save changes</button>  
+  </div>
+</div>
+
+{% endblock %}
