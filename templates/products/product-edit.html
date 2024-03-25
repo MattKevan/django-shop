@@ -48,6 +48,9 @@
         <div class="form-group">
           <label for="id_title" class="">Title</label>
           <input type="text" name="title" id="id_title" value="{{ form.title.value }}" required class="input-text" placeholder="Title">
+          {% if form.title.errors %}
+            <span class="error">{{ form.title.errors }}</span>
+          {% endif %}
         </div>
 
         <div class="form-group">
