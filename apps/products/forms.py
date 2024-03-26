@@ -22,7 +22,7 @@ ProductImageFormSet = forms.inlineformset_factory(
 class VariationForm(forms.ModelForm):
     class Meta:
         model = Variation
-        fields = ['title', 'price', 'sku', 'options']
+        fields = ['title', 'image', 'price', 'sku']
 
 VariationFormSet = forms.inlineformset_factory(
     Product,

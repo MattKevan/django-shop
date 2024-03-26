@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponseForbidden
 from .models import Shop, Product, ProductImage
-from .forms import ProductCreateForm, ProductImageForm, ProductImageFormSet
+from .forms import ProductCreateForm, ProductImageForm, ProductImageFormSet, VariationFormSet
+from django.views.decorators.csrf import csrf_protect
 
 def is_shop_owner_or_member(user, shop):
     return user == shop.shop_owner or user in shop.shop_members.all()
@@ -47,6 +48,7 @@ def add_product(request, shop_slug):
     }
     return render(request, 'store/dashboards/create-product.html', context)
 
+@csrf_protect
 def edit_product(request, shop_slug, product_slug):
     shop = get_object_or_404(Shop, slug=shop_slug)
     product = get_object_or_404(Product, shop=shop, slug=product_slug)
@@ -57,39 +59,28 @@ def edit_product(request, shop_slug, product_slug):
     if request.method == 'POST':
         form = ProductCreateForm(request.POST, instance=product)
         formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
+        variation_formset = VariationFormSet(request.POST, request.FILES, instance=product)
 
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid() and variation_formset.is_valid():
             form.save()
-            if formset.is_valid():
-                formset.save()
+            formset.save()
+            variation_formset.save()
             return redirect('shop_dashboard_products', shop_slug=shop.slug)
+        else:
+            # Print form errors
+            print("Main form errors:", form.errors)
+            print("Image formset errors:", formset.errors)
+            print("Variation formset errors:", variation_formset.errors)
     else:
         form = ProductCreateForm(instance=product)
         formset = ProductImageFormSet(instance=product)
+        variation_formset = VariationFormSet(instance=product)
 
     context = {
         'shop': shop,
         'product': product,
         'form': form,
         'formset': formset,
+        'variation_formset': variation_formset,
     }
     return render(request, 'products/product-edit.html', context)
-
-def add_product_image(request):
-    if request.method == 'POST':
-        form = ProductImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            product_image = form.save(commit=False)
-            product_id = request.POST.get('product_id')
-            if product_id:
-                product_image.product_id = product_id
-                product_image.save()
-                return render(request, 'products/product-image.html', {'image': product_image})
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-@require_POST
-def delete_product_image(request):
-    image_id = request.POST.get('image_id')
-    image = get_object_or_404(ProductImage, id=image_id)
-    image.delete()
-    return JsonResponse({'success': True})
