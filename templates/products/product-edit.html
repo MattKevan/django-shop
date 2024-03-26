@@ -37,107 +37,78 @@
     </button>
   </nav>
 </div>
+<form id="product-form" method="POST" class="">
 
 <div class="mt-6">
   <div id="hs-tab-to-select-1" role="tabpanel" aria-labelledby="hs-tab-to-select-item-1">
-    <div class="p-3 sm:p-0">
+    <div class="p-3 sm:p-0 grid grid-cols-1 gap-6">
 
-      <form id="product-form" method="POST" class="grid grid-cols-1 gap-6" enctype="multipart/form-data">
+    
         {% csrf_token %}
-
-        <div class="form-group">
-          <label for="id_title" class="">Title</label>
-          <input type="text" name="title" id="id_title" value="{{ form.title.value }}" required class="input-text" placeholder="Title">
-          {% if form.title.errors %}
-            <span class="error">{{ form.title.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="id_description" class="field-label">Description</label>
-          <textarea name="description" id="id_description" class="input-textarea">{{ form.description.value }}</textarea>
-          {% if form.description.errors %}
-            <span class="error">{{ form.description.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="id_collection" class="field-label">Collections</label>
-          <div class="relative">
-            <select name="collection" id="id_collection" multiple data-hs-select='{
-                "placeholder": "Select collections",
-                "toggleTag": "<button type=\"button\"></button>",
-                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 px-4 pe-9 flex text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-[1] dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600",
-                "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto dark:bg-slate-900 dark:border-gray-700",
-                "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-none focus:bg-gray-100 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-gray-200 dark:focus:bg-slate-800",
-                "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"flex-shrink-0 size-3.5 text-blue-600 dark:text-blue-500\" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>"
-              }' class="hidden">
-              {% for collection in form.collection.field.queryset %}
-                <option value="{{ collection.pk }}" {% if collection in form.collection.value %}selected{% endif %}>
-                  {{ collection.name }}
-                </option>
-              {% endfor %}
-            </select>
-            <div class="absolute top-1/2 end-3 -translate-y-1/2">
-              <svg class="flex-shrink-0 size-3.5 text-gray-500 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
-            </div>
-          </div>
-          <!-- End Select -->
-        </div>
-
-        <div class="attributes form-group">
-          <label for="id_attributes" class="field-label">Attributes</label>
-          <div class="relative">
-            <select name="attributes" id="id_attributes" multiple data-hs-select='{
-                "placeholder": "Select attributes",
-                "toggleTag": "<button type=\"button\"></button>",
-                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 px-4 pe-9 flex text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:border-blue-500 focus:ring-blue-500 before:absolute before:inset-0 before:z-[1] dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600",
-                "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto dark:bg-slate-900 dark:border-gray-700",
-                "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-none focus:bg-gray-100 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-gray-200 dark:focus:bg-slate-800",
-                "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"flex-shrink-0 size-3.5 text-blue-600 dark:text-blue-500\" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>"
-              }' class="hidden">
-              {% for attribute in form.attributes.field.queryset %}
-              <option value="{{ attribute.pk }}" {% if attribute in form.attributes.value %}selected{% endif %}>
-                {{ attribute.title }}
-              </option>
-              {% endfor %}
-            </select>
-            <div class="absolute top-1/2 end-3 -translate-y-1/2">
-              <svg class="flex-shrink-0 size-3.5 text-gray-500 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
-            </div>
-
-          </div>
-          <!-- End Select -->
-        </div>
-
-      </form>
+        {{ form.as_p }}
+    
+      
+      
     </div>
   </div>
+
   <div id="hs-tab-to-select-2" class="hidden" role="tabpanel" aria-labelledby="hs-tab-to-select-item-2">
     <div class="p-3 sm:p-0">
-      <div id="image-formset" class="grid grid-cols-3 sm:grid-cols-6 gap-5">
-        {% for image in product.images.all %}
-          <div class="product-image">
-            <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" class="w-full">
-            <p>{{ image.alt_text }}</p>
-            <button class="delete-image" hx-post="{% url 'delete_product_image' %}" hx-vals='{"image_id": "{{ image.id }}"}' hx-target="closest .product-image" hx-swap="outerHTML" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Delete</button>
-          </div>
-        {% endfor %}
-        <form id="image-form" hx-post="{% url 'add_product_image' %}" hx-encoding="multipart/form-data" hx-target="#image-formset" hx-swap="beforeend">
-          {% csrf_token %}
-          <input type="hidden" name="product_id" value="{{ product.id }}">
-          <input type="file" name="image" required>
-          <input type="text" name="alt_text" placeholder="Alt Text">
-          <button type="submit">Add Image</button>
-        </form>
+      
+      <div id="image-formset">
+        {{ formset.management_form }}
+        <div class="flex flex-wrap gap-6">
+          {% for form in formset %}
+            <div class="image-form w-36">
+              {% if form.instance.pk %}
+                <div class="w-36 h-36">
+                  <img src="{{ form.instance.image.url }}" alt="{{ form.instance.alt_text }}" class="object-cover w-36 h-36 rounded">
+                </div>
+                {{ form.id }}
+                <input type="text" name="{{ form.alt_text.html_name }}" id="{{ form.alt_text.id_for_label }}" value="{{ form.alt_text.value|default:'' }}" class="my-3 py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" placeholder="Alt text">
+                <div class="flex">
+                  <input type="checkbox" name="{{ form.DELETE.html_name }}" id="{{ form.DELETE.id_for_label }}" class="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800">
+                  <label for="{{ form.DELETE.id_for_label }}" class="text-sm text-gray-500 ms-3 dark:text-gray-400">Delete</label>
+                </div>
+              {% else %}
+              <div class="w-36 h-36 border rounded dark:border-gray-700 mb-3">
+              </div>
+                {{ form.image }}
+                {% endif %}
+              {% if form.errors %}
+                <div class="error">
+                  {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                      <p>{{ field }}: {{ error }}</p>
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          {% if formset.non_form_errors %}
+            <div class="error">
+              {% for error in formset.non_form_errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
+    
     </div>
   </div>
+
   <div id="hs-tab-to-select-3" class="hidden" role="tabpanel" aria-labelledby="hs-tab-to-select-item-3">
     <div class="p-3 sm:p-0">
-      <p class="text-gray-500 dark:text-gray-400">
-        This is the <em class="font-semibold text-gray-800">third</em> item's tab body.
-      </p>
+      <div id="variations">
+        {{ variant_formset.management_form }}
+        {% for form in variant_formset %}
+            <div class="variant-form">
+                {{ form.as_p }}
+            </div>
+        {% endfor %}
+    </div>
     </div>
   </div>
 
@@ -148,5 +119,6 @@
     <button type="submit" form="product-form" class="button-primary z-[100]">Save changes</button>  
   </div>
 </div>
+</form>
 
 {% endblock %}

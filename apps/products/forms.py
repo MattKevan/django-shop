@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product, ProductImage
+from .models import Product, ProductImage, Variation
 
 class ProductCreateForm(forms.ModelForm):
     class Meta:
@@ -16,5 +16,18 @@ ProductImageFormSet = forms.inlineformset_factory(
     ProductImage,
     form=ProductImageForm,
     extra=1,
+    can_delete=True
+)
+
+class VariationForm(forms.ModelForm):
+    class Meta:
+        model = Variation
+        fields = ['title', 'price', 'sku', 'options']
+
+VariationFormSet = forms.inlineformset_factory(
+    Product,
+    Variation,
+    form=VariationForm,
+    extra=0,
     can_delete=True
 )

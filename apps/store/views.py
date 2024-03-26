@@ -20,7 +20,6 @@ def is_shop_owner_or_member(user):
 
 def is_shop_owner_or_member(user, shop):
     return user == shop.shop_owner or user in shop.shop_members.all()
-
 #
 #   Store configuration dashboards
 #

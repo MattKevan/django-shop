@@ -1,5 +1,5 @@
 <div class="product-image">
     <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" width="100">
     <p>{{ image.alt_text }}</p>
-    <button class="delete-image" data-image-id="{{ image.id }}">Delete</button>
+    <button class="delete-image" hx-post="{% url 'delete_product_image' %}" hx-vals='{"image_id": "{{ image.id }}"}' hx-target="closest .product-image" hx-swap="outerHTML" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>Delete</button>
   </div>

@@ -1,0 +1,9 @@
+{% for form in variant_forms %}
+  <form id="variant-form-{{ form.instance.id }}" method="POST" class="grid grid-cols-1 gap-6">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-group">
+      <button type="submit" class="button-primary">Save Variant</button>
+    </div>
+  </form>
+{% endfor %}
