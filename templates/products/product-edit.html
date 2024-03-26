@@ -39,7 +39,7 @@
 </div>
 
 
-<form id="product-form" method="POST" enctype="multipart/form-data" class="max-w-5xl">
+<form id="product-form" method="POST" enctype="multipart/form-data" class="max-w-5xl" hx-disable>
   {% csrf_token %}
 
 <div class="mt-6">
@@ -66,6 +66,7 @@
         {{ formset.management_form }}
         <div class="flex flex-wrap gap-6">
           {% for form in formset %}
+          
             <div class="image-form w-36">
               {% if form.instance.pk %}
                 <div class="w-36 h-36">

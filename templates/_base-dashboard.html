@@ -1,7 +1,7 @@
 {% load static %}
 {% include '_head.html' %}
 
-<body class="bg-gray-50 dark:bg-slate-900" hx-boost="true" hx-push-url="true" hx-indicator=".progress">
+<body class="bg-gray-50 dark:bg-slate-900" hx-boost="true" hx-push-url="true" hx-indicator=".progress" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
         <!-- ========== HEADER ========== -->
         <header class="sticky top-0 inset-x-0 flex flex-wrap sm:justify-start sm:flex-nowrap z-[48] w-full bg-white border-b text-sm py-2.5 sm:py-4 lg:ps-64 dark:bg-gray-800 dark:border-gray-700">

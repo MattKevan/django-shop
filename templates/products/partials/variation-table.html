@@ -2,7 +2,7 @@
                 <tr class="bg-white hover:bg-gray-50 dark:bg-slate-900 dark:hover:bg-slate-800">
                   <td class="size-px px-3 min-w-48 whitespace-nowrap">
                     {{ form.id }}
-                    <input type="text" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" value="{{ form.title.value|default:'' }}" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" placeholder="Title">
+                    <input type="text" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" value="{{ form.title.value|default:'' }}" class="py-2 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" placeholder="Title">
                     {% if form.title.errors %}
                       <div class="error">
                         {% for error in form.title.errors %}
@@ -28,7 +28,7 @@
   
                   </td>
                   <td class="size-px px-3 min-w-24 whitespace-nowrap">
-                    <input type="number" name="{{ form.price.html_name }}" id="{{ form.price.id_for_label }}" value="{{ form.price.value|default:'' }}" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" placeholder="Price">
+                    <input type="text" name="{{ form.price.html_name }}" id="{{ form.price.id_for_label }}" value="{{ form.price.value|default:'' }}" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" placeholder="Price">
                     {% if form.price.errors %}
                       <div class="error">
                         {% for error in form.price.errors %}
