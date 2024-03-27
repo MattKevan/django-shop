@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponseForbidden
-from .models import Shop, Product, ProductImage
+from .models import Shop, Product, ProductImage, Variation
 from .forms import ProductCreateForm, ProductImageForm, ProductImageFormSet, VariationFormSet
 from django.views.decorators.csrf import csrf_protect
 
@@ -20,33 +20,47 @@ def product_page(request, slug):
     return render(request, 'products/product_page.html', {'product': product, 'variations': variations})
 
 @login_required
+
+@login_required
 def add_product(request, shop_slug):
     shop = get_object_or_404(Shop, slug=shop_slug)
-    user_shops = Shop.objects.filter(shop_owner=request.user) | Shop.objects.filter(shop_members=request.user)
 
-    # Check if the user is the shop owner or a shop member
-    if not (request.user == shop.shop_owner or request.user in shop.shop_members.all()):
+    if not is_shop_owner_or_member(request.user, shop):
         return HttpResponseForbidden("You do not have permission to create products for this shop.")
 
     if request.method == 'POST':
         form = ProductCreateForm(request.POST)
-        if form.is_valid():
+        formset = ProductImageFormSet(request.POST, request.FILES)
+        variation_formset = VariationFormSet(request.POST)
+
+        if form.is_valid() and formset.is_valid() and variation_formset.is_valid():
             product = form.save(commit=False)
-            product.user = request.user
             product.shop = shop
             product.save()
-            form.save_m2m()  # Save many-to-many relationships
-            return redirect('shop_dashboard', shop_slug=shop.slug)
+
+            images = formset.save(commit=False)
+            for image in images:
+                image.product = product
+                image.save()
+
+            variations = variation_formset.save(commit=False)
+            for variation in variations:
+                variation.product = product
+                variation.save()
+
+            return redirect('shop_dashboard_products', shop_slug=shop.slug)
     else:
         form = ProductCreateForm()
+        formset = ProductImageFormSet(queryset=ProductImage.objects.none())
+        variation_formset = VariationFormSet(queryset=Variation.objects.none())
 
     context = {
-        'form': form,
         'shop': shop,
-        'user_shops': user_shops,
-
+        'form': form,
+        'formset': formset,
+        'variation_formset': variation_formset,
     }
-    return render(request, 'store/dashboards/create-product.html', context)
+    return render(request, 'products/product-add.html', context)
 
 @csrf_protect
 def edit_product(request, shop_slug, product_slug):
